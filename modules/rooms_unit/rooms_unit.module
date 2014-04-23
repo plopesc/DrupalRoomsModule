@@ -174,10 +174,10 @@ function rooms_unit_permission() {
         'title' => t('%type_name: Edit any bookable unit', array('%type_name' => $type->label)),
       ),
       "delete own $type_name bookable unit" => array(
-        'title' => t('%type_name: Edit own bookable unit', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Delete own bookable unit', array('%type_name' => $type->label)),
       ),
       "delete any $type_name bookable unit" => array(
-        'title' => t('%type_name: Edit any bookable unit', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Delete any bookable unit', array('%type_name' => $type->label)),
       ),
     );
   }
