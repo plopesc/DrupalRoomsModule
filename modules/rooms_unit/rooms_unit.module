@@ -156,7 +156,10 @@ function rooms_unit_permission() {
       'description' => t('Get an overview of all bookable units.'),
     ),
     'access bookable units' => array(
-      'title' => 'View bookable units',
+      'title' => t('View bookable units'),
+    ),
+    'view own unpublished bookable units' => array(
+      'title' => t('View own unpublished bookable units'),
     ),
   );
 
@@ -165,16 +168,16 @@ function rooms_unit_permission() {
     $type_name = check_plain($type->type);
     $permissions += array(
       "create $type_name bookable unit" => array(
-        'title' => t('%type_name: Create new content', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Create new bookable units', array('%type_name' => $type->label)),
       ),
       "edit own $type_name bookable unit" => array(
-        'title' => t('%type_name: Edit own bookable unit', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Edit own bookable units', array('%type_name' => $type->label)),
       ),
       "edit any $type_name bookable unit" => array(
         'title' => t('%type_name: Edit any bookable unit', array('%type_name' => $type->label)),
       ),
       "delete own $type_name bookable unit" => array(
-        'title' => t('%type_name: Delete own bookable unit', array('%type_name' => $type->label)),
+        'title' => t('%type_name: Delete own bookable units', array('%type_name' => $type->label)),
       ),
       "delete any $type_name bookable unit" => array(
         'title' => t('%type_name: Delete any bookable unit', array('%type_name' => $type->label)),
@@ -241,8 +244,8 @@ function rooms_unit_access($op, $unit = NULL, $account = NULL) {
     return TRUE;
   }
 
-  // Check if authors can view their own unpublished nodes.
-  if ($op == 'view' && !$unit->status && user_access('view own unpublished content', $account) && $account->uid == $node->uid && $account->uid != 0) {
+  // Check if authors can view their own unpublished bookable units.
+  if ($op == 'view' && !$unit->status && user_access('view own unpublished bookable units', $account) && $account->uid == $unit->uid && $account->uid != 0) {
     $rights[$account->uid][$cid][$op] = TRUE;
     return TRUE;
   }
