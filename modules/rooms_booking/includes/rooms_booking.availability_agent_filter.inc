@@ -35,17 +35,24 @@ abstract class AvailabilityAgentCommonFilter implements AvailabilityAgentFilter 
     $this->parameters = $parameters;
   }
 
-  // Returns an array containing all the values of units_a that are present in units_b
-  function array_units_intersect($units_a, $units_b) {
-    $keys_units_a = array_keys($units_b['rooms_unit']);
-    $keys_units_b = array_keys($units_a['rooms_unit']);
+  /**
+   * Intersects the units that passes the filter and the unit set provided.
+   *
+   * @param array $filtered_units
+   *   The rooms_units that passes the current filter.
+   * @return array
+   *   The intersection of filtered units with the provided set.
+   */
+  function intersectUnits($filtered_units) {
+    $filtered_keys = array_keys($filtered_units);
+    $unit_keys = array_keys($this->units);
 
-    $keys_units = array_intersect($keys_units_a, $keys_units_b);
+    $keys_units = array_intersect($filtered_keys, $unit_keys);
 
     $results = array();
 
     foreach ($keys_units as $key) {
-      $results['rooms_unit'][$key] = $units_a['rooms_unit'][$key];
+      $results[$key] = $this->units[$key];
     }
 
     return $results;
@@ -86,11 +93,11 @@ class AvailabilityAgentSizeFilter extends AvailabilityAgentCommonFilter {
     }
 
     if (empty($this->units)) {
-      return $results;
+      return $results['rooms_unit'];
     }
     else {
       // Computes the intersection of units and results
-      return $this->array_units_intersect($this->units, $results);
+      return $this->intersectUnits($results['rooms_unit']);
     }
 
   }
@@ -147,11 +154,11 @@ class AvailabilityAgentDateFilter extends AvailabilityAgentCommonFilter {
     }
 
     if (empty($this->units)) {
-      return $results;
+      return $results['rooms_unit'];
     }
     else {
       // Computes the intersection of units and results
-      return $this->array_units_intersect($this->units, $results);
+      return $this->intersectUnits($results['rooms_unit']);
     }
 
   }
@@ -180,6 +187,9 @@ class AvailabilityAgentCommerceFilter extends AvailabilityAgentCommonFilter {
 
       // Execute the query and collect the results
       $results = $query->execute();
+      if (count($results)) {
+        $results = $results['rooms_unit'];
+      }
     }
     else {
       $results = $this->units;
@@ -205,9 +215,9 @@ class AvailabilityAgentCommerceFilter extends AvailabilityAgentCommonFilter {
               $e_date = new DateTime($line_item_values->rooms_booking_dates[LANGUAGE_NONE][0]['value2']);
 
               // If current line_item date interval overlap parameters interval remove unit from results
-              if ( $this->check_in_range($s_date, $e_date, $start_date, $end_date) ) {
-                if (isset($results['rooms_unit'][$line_item_values->rooms_booked_unit_id[LANGUAGE_NONE][0]['value']])) {
-                  unset($results['rooms_unit'][$line_item_values->rooms_booked_unit_id[LANGUAGE_NONE][0]['value']]);
+              if ( $this->checkInRange($s_date, $e_date, $start_date, $end_date) ) {
+                if (isset($results[$line_item_values->rooms_booked_unit_id[LANGUAGE_NONE][0]['value']])) {
+                  unset($results[$line_item_values->rooms_booked_unit_id[LANGUAGE_NONE][0]['value']]);
                 }
               }
             }
@@ -221,12 +231,12 @@ class AvailabilityAgentCommerceFilter extends AvailabilityAgentCommonFilter {
     }
     else {
       // Computes the intersection of units and results
-      return $this->array_units_intersect($this->units, $results);
+      return $this->intersectUnits($results);
     }
   }
 
   // Check if search interval overlaps line_item interval
-  private function check_in_range($line_item_start_date, $line_item_end_date, $start_date, $end_date) {
+  private function checkInRange($line_item_start_date, $line_item_end_date, $start_date, $end_date) {
     if (!(($line_item_start_date < $start_date && $line_item_end_date < $start_date) ||
           ($line_item_start_date > $end_date && $line_item_end_date > $end_date))) {
 
