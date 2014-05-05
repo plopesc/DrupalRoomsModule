@@ -1,0 +1,4 @@
+<?php
+
+
+module_load_include('inc', 'rooms_availability_constraints', 'rooms_availability_constraints.field');

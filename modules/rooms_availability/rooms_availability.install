@@ -265,6 +265,40 @@ function rooms_availability_schema() {
 }
 
 /**
+ * Implements hook_field_schema().
+ */
+function rooms_availability_field_schema($field) {
+  if ($field['type'] == 'rooms_availability_range') {
+    return array(
+      'columns' => array(
+        'start_date' => array(
+          'type' => 'varchar',
+          'length' => 10,
+          'not null' => TRUE,
+        ),
+        'end_date' => array(
+          'type' => 'varchar',
+          'length' => 10,
+          'not null' => TRUE,
+        ),
+        'minimum_stay' => array(
+          'type' => 'int',
+          'not null' => FALSE,
+        ),
+        'maximum_stay' => array(
+          'type' => 'int',
+          'not null' => FALSE,
+        ),
+        'start_day' => array(
+          'type' => 'int',
+          'not null' => FALSE,
+        ),
+      ),
+    );
+  }
+}
+
+/**
  * Renames permissions.
  */
 function rooms_availability_update_7001() {

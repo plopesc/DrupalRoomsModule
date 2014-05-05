@@ -10,6 +10,8 @@
 define('ROOMS_AVAILABILITY_ADMIN_STYLE', 1);
 define('ROOMS_AVAILABILITY_GENERIC_STYLE', 2);
 
+// Load field related code.
+module_load_include('inc', 'rooms_availability', 'rooms_availability.field');
 
 /**
  * Implements hook_permission().
