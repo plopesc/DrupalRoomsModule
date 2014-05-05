@@ -219,8 +219,8 @@ class AvailabilityAgent {
     $units = $av_commercefilter->applyFilter();
 
     // Apply AvailabilityAgentDurationFilter
-    $av_durationfilter = new AvailabilityAgentdurationFilter($units, array('start_date' => $this->start_date, 'end_date' => $this->end_date));
-    $units = $av_durationfilter->applyFilter();
+    //$av_durationfilter = new AvailabilityAgentdurationFilter($units, array('start_date' => $this->start_date, 'end_date' => $this->end_date));
+    //$units = $av_durationfilter->applyFilter();
 
     ctools_include('plugins');
     $filters = ctools_get_plugins('rooms_booking', 'availabilityagent_filter');

@@ -1,4 +1,17 @@
 <?php
 
-
 module_load_include('inc', 'rooms_availability_constraints', 'rooms_availability_constraints.field');
+
+/**
+ * Implements hook_rooms_booking_availabilityagent_filter().
+ */
+function rooms_availability_constraints_rooms_booking_availabilityagent_filter() {
+  return array(
+    'availability_agent_range_filter' => array(
+      'label' => t('Availability range'),
+      'handler' => array(
+        'class' => 'AvailabilityAgentDurationFilter',
+      )
+    ),
+  );
+}
