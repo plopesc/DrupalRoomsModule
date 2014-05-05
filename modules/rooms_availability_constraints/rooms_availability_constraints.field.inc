@@ -103,24 +103,28 @@ function rooms_availability_constraints_field_validate($entity_type, $entity, $f
         );
       }
       $minimum_set = $maximum_set = FALSE;
-      if (!((int) $item['minimum_stay'] == $item['minimum_stay'] && (int) $item['minimum_stay'] > 0)) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'rooms_availability_constraints_minimum_stay',
-          'message' => t('Minimum stay value must be a positive integer value'),
-        );
-      }
-      else {
-        $minimum_set = TRUE;
+      if (!empty($item['minimum_stay'])) {
+        if (!((int) $item['minimum_stay'] == $item['minimum_stay'] && (int) $item['minimum_stay'] > 0)) {
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'rooms_availability_constraints_minimum_stay',
+            'message' => t('Minimum stay value must be a positive integer value'),
+          );
+        }
+        else {
+          $minimum_set = TRUE;
+        }
       }
 
-      if (!((int) $item['maximum_stay'] == $item['maximum_stay'] && (int) $item['maximum_stay'] > 0)) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'rooms_availability_constraints_maximum_stay',
-          'message' => t('Maximum stay value must be a positive integer value'),
-        );
-      }
-      else {
-        $maximum_set = TRUE;
+      if (!empty($item['maximum_stay'])){
+        if (!((int) $item['maximum_stay'] == $item['maximum_stay'] && (int) $item['maximum_stay'] > 0)) {
+          $errors[$field['field_name']][$langcode][$delta][] = array(
+            'error' => 'rooms_availability_constraints_maximum_stay',
+            'message' => t('Maximum stay value must be a positive integer value'),
+          );
+        }
+        else {
+          $maximum_set = TRUE;
+        }
       }
 
       if ($maximum_set && $minimum_set && ($item['minimum_stay'] > $item['maximum_stay'])) {
