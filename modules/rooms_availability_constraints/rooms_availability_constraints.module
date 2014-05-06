@@ -4,8 +4,119 @@ module_load_include('inc', 'rooms_availability_constraints', 'rooms_availability
 
 define('ROOMS_AVAILABILITY_CONSTRAINT_MUST_START', 'must');
 define('ROOMS_AVAILABILITY_CONSTRAINT_IF_STARTS', 'if');
-define('ROOMS_AVAILABILITY_CONSTRAINT_BOTH_STARTS', 'both');
 
+/**
+ * Implements hook_form_FORM_ID_alter().
+ * FORM_ID = rooms_unit_type_form
+ */
+function rooms_availability_constraints_form_rooms_unit_type_form_alter(&$form, &$form_state, $form_id) {
+  $unit_type = $form_state['rooms_unit_type'];
+  // Unit availability information for administrators.
+  $form['availability_constraints'] = array(
+    '#type' => 'fieldset',
+    '#group' => 'additional_settings',
+    '#title' => t('Status'),
+    '#tree' => FALSE,
+    '#weight' => 80,
+    '#attributes' => array(
+      'class' => array('unit-form-availability '),
+    ),
+    '#attached' => array(
+      'js' => array(drupal_get_path('module', 'rooms_unit') . '/js/rooms_unit.js'),
+    ),
+  );
+
+  $form['availability_constraints']['rooms_availability_range_unit'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Rooms availability range constraints at unit level'),
+    '#default_value' => variable_get('rooms_availability_constraints_unit_' . $unit_type->type, 0),
+    '#description' => t('If you disable this feature, all the stored data will be removed')
+  );
+
+  $form['availability_constraints']['rooms_availability_range_type'] = array(
+    '#type' => 'checkbox',
+    '#title' => t('Enable Rooms availability range constraints at unit type level'),
+    '#default_value' => variable_get('rooms_availability_constraints_type_' . $unit_type->type, 0),
+    '#description' => t('If you disable this feature, all the stored data will be removed')
+  );
+
+  if (variable_get('rooms_availability_constraints_type_' . $unit_type->type, 0) == 0) {
+    $form['rooms_constraints_range']['#access'] = FALSE;
+  }
+
+  array_unshift($form['#submit'], 'rooms_availability_constraints_rooms_unit_type_form_submit');
+}
+
+/**
+ * Submit handler for rooms_unit_type_form.
+ */
+function rooms_availability_constraints_rooms_unit_type_form_submit($form, &$form_state) {
+  $unit_type = $form_state['rooms_unit_type'];
+
+  if (variable_get('rooms_availability_constraints_unit_' . $unit_type->type, 0) == 0
+    && $form_state['values']['rooms_availability_range_unit'] == 1) {
+    rooms_availability_constraints_add_availability_range_field('rooms_unit', $unit_type->type);
+  }
+  elseif (variable_get('rooms_availability_constraints_unit_' . $unit_type->type, 0) == 1
+    && $form_state['values']['rooms_availability_range_unit'] == 0) {
+    field_delete_instance(array(
+      'field_name' => 'rooms_constraints_range',
+      'entity_type' => 'rooms_unit',
+      'bundle' => $unit_type->type,
+    ));
+  }
+
+  if (variable_get('rooms_availability_constraints_type_' . $unit_type->type, 0) == 1
+    && $form_state['values']['rooms_availability_range_type'] == 0) {
+    $form_state['values']['rooms_constraints_range']['und'] = array();
+  }
+
+  variable_set('rooms_availability_constraints_unit_' . $unit_type->type, $form_state['values']['rooms_availability_range_unit']);
+  variable_set('rooms_availability_constraints_type_' . $unit_type->type, $form_state['values']['rooms_availability_range_type']);
+}
+
+/**
+ * Adds the default Availability range field to certain bundle.
+ */
+function rooms_availability_constraints_add_availability_range_field($entity_type, $bundle) {
+  // Create field ('rooms_constraint_range') if not exist
+  if (field_read_field('rooms_constraints_range') === FALSE) {
+    $field = array(
+      'field_name' => 'rooms_constraints_range',
+      'type' => 'rooms_availability_constraints_range',
+      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
+    );
+    field_create_field($field);
+  }
+
+  field_cache_clear();
+
+  if (field_read_instance($entity_type, 'rooms_constraints_range', $bundle) === FALSE) {
+    // Create the instance on the bundle.
+    $instance = array(
+      'field_name' => 'rooms_constraints_range',
+      'entity_type' => $entity_type,
+      'label' => 'Availability ranges',
+      'bundle' => $bundle,
+      // If you don't set the "required" property then the field wont be required by default.
+      'required' => FALSE,
+      'widget' => array(
+        'type' => 'rooms_availability_constraints_range',
+      ),
+    );
+    field_create_instance($instance);
+  }
+}
+
+/**
+ * Implements hook_entity_delete().
+ */
+function rooms_availability_constraints_entity_delete($entity, $type) {
+  if ($type == 'rooms_unit_type') {
+    variable_del('rooms_availability_constraints_unit_' . $entity->type);
+    variable_del('rooms_availability_constraints_type_' . $entity->type);
+  }
+}
 
 /**
  * Implements hook_rooms_booking_availabilityagent_filter().

@@ -53,3 +53,21 @@ function rooms_availability_constraints_field_schema($field) {
     );
   }
 }
+
+/**
+ * Implements hook_install().
+ */
+function rooms_availability_constraints_install() {
+  rooms_availability_constraints_add_availability_range_field('rooms_unit_type', 'rooms_unit_type');
+}
+
+/**
+ * Implements hook_uninstall().
+ */
+function rooms_availability_constraints_uninstall() {
+  foreach (rooms_unit_get_types() as $type) {
+    variable_del('rooms_availability_constraints_unit_' . $type->type);
+    variable_del('rooms_availability_constraints_type_' . $type->type);
+  }
+  field_delete_field('rooms_constraints_range');
+}

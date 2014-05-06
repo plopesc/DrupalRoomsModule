@@ -19,7 +19,7 @@ function rooms_availability_constraints_field_info() {
  * Implements hook_field_is_empty().
  */
 function rooms_availability_constraints_field_is_empty($item, $field) {
-  return empty($item['start_date']) || empty($item['start_date']);
+  return !is_string($item['start_date']) || !is_string($item['start_date']);
 }
 
 /**
@@ -109,48 +109,5 @@ function rooms_availability_constraints_field_validate($entity_type, $entity, $f
         );
       }
     }
-  }
-}
-
-/**
- * Implements hook_form_FORM_ID_alter().
- * FORM_ID = rooms_unit_type_form
- */
-function rooms_availability_constraints_form_rooms_unit_type_form_alter(&$form, &$form_state, $form_id) {
-  $form['#submit'][] = 'rooms_availability_constraints_rooms_unit_type_form_submit';
-}
-
-function rooms_availability_constraints_rooms_unit_type_form_submit($form, &$form_state) {
-  rooms_availability_constraints_add_availability_range_field($form_state['unit_type']);
-}
-
-/**
- * Adds the default Availability range field to certain bundle.
- */
-function rooms_availability_constraints_add_availability_range_field($entity) {
-  // Create field ('rooms_booking_unit_options') if not exist
-  if (field_read_field('rooms_constraints_range') === FALSE) {
-    $field = array(
-      'field_name' => 'rooms_constraints_range',
-      'type' => 'rooms_availability_constraints_range',
-      'cardinality' => FIELD_CARDINALITY_UNLIMITED,
-    );
-    field_create_field($field);
-  }
-
-  if (field_read_instance('rooms_unit', 'rooms_constraints_range', $entity->type) === FALSE) {
-    // Create the instance on the bundle.
-    $instance = array(
-      'field_name' => 'rooms_constraints_range',
-      'entity_type' => 'rooms_unit',
-      'label' => 'Availability ranges',
-      'bundle' => $entity->type,
-      // If you don't set the "required" property then the field wont be required by default.
-      'required' => FALSE,
-      'widget' => array(
-        'type' => 'rooms_availability_constraints_range',
-      ),
-    );
-    field_create_instance($instance);
   }
 }

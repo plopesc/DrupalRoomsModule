@@ -47,7 +47,6 @@ class RoomsUnitUIController extends EntityDefaultUIController {
 
     );
 
-
     // Add menu items to add each different type of room.
     foreach (rooms_unit_get_types() as $type) {
       $items[$this->path . '/add/' . $type->type] = array(

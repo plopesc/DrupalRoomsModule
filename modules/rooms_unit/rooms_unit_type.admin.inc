@@ -150,6 +150,11 @@ function rooms_unit_type_form($form, &$form_state, $unit_type, $op = 'edit') {
   $form_state['rooms_unit_type'] = $unit_type;
   field_attach_form('rooms_unit_type', $unit_type, $form, $form_state);
 
+  $form['additional_settings'] = array(
+    '#type' => 'vertical_tabs',
+    '#weight' => 99,
+  );
+
   $form['actions'] = array(
     '#type' => 'actions',
     '#tree' => FALSE,
@@ -161,16 +166,6 @@ function rooms_unit_type_form($form, &$form_state, $unit_type, $op = 'edit') {
     '#weight' => 100,
   );
 
-  //Locking not supported yet
-  /*if (!$unit_type->isLocked() && $op != 'add') {
-    $form['actions']['delete'] = array(
-      '#type' => 'submit',
-      '#value' => t('Delete unit type'),
-      '#weight' => 45,
-      '#limit_validation_errors' => array(),
-      '#submit' => array('rooms_unit_type_form_submit_delete')
-    );
-  }*/
   return $form;
 }
 
@@ -192,12 +187,12 @@ function rooms_unit_type_form_validate(&$form, &$form_state) {
     }
     else {
       $result = db_select('node', 'n')
-                  ->fields('n', array('title', 'nid'))
-                  ->condition('title', $source_ref[0])
-                  ->condition('n.type', 'unit_description')
-                  ->range(0, 1)
-                  ->execute()
-                  ->fetchField();
+        ->fields('n', array('title', 'nid'))
+        ->condition('title', $source_ref[0])
+        ->condition('n.type', 'unit_description')
+        ->range(0, 1)
+        ->execute()
+        ->fetchField();
 
       if (empty($result)) {
         form_set_error('data][rooms_description_source', t('You must enter a valid node.'));
@@ -207,9 +202,7 @@ function rooms_unit_type_form_validate(&$form, &$form_state) {
 
   $unit_type = $form_state['rooms_unit_type'];
   field_attach_form_validate('rooms_unit_type', $unit_type, $form, $form_state);
-
 }
-
 
 /**
  * Form API submit callback for the type form.
