@@ -2,6 +2,11 @@
 
 module_load_include('inc', 'rooms_availability_constraints', 'rooms_availability_constraints.field');
 
+define('ROOMS_AVAILABILITY_CONSTRAINT_MUST_START', 'must');
+define('ROOMS_AVAILABILITY_CONSTRAINT_IF_STARTS', 'if');
+define('ROOMS_AVAILABILITY_CONSTRAINT_BOTH_STARTS', 'both');
+
+
 /**
  * Implements hook_rooms_booking_availabilityagent_filter().
  */
@@ -14,4 +19,107 @@ function rooms_availability_constraints_rooms_booking_availabilityagent_filter()
       )
     ),
   );
+}
+
+/**
+ * Implements hook_element_info().
+ */
+function rooms_availability_constraints_element_info() {
+  $elements = array();
+  $elements['rooms_availability_range'] = array(
+    '#input' => TRUE,
+    '#process' => array('rooms_availability_range_process'),
+  );
+  return $elements;
+}
+
+function rooms_availability_range_process($element, $form_state, $complete_form) {
+  $range = rooms_date_range_fields();
+
+  $always_id = drupal_html_id('rooms-constraints-range-always');
+  $element['always'] = array(
+    '#type' =>  'checkbox',
+    '#title' => t('Always'),
+    '#default_value' =>  isset($element['#value']['always']) ? $element['#value']['always'] : '',
+    '#attributes' => array(
+      'id' => $always_id,
+    )
+  );
+
+  $element['start_date'] = array(
+    '#required' => FALSE,
+    '#default_value' => (isset($element['#value']['start_date']) && !isset($element['#value']['always'])) ? $element['#value']['start_date'] : '',
+    '#states' => array(
+      'visible' => array(
+        ':input[id="' . $always_id . '"]' => array('checked' => FALSE),
+      ),
+    ),
+  ) + $range['rooms_start_date'];
+
+  $element['end_date'] = array(
+    '#required' => FALSE,
+    '#default_value' => (isset($element['#value']['end_date']) && !isset($element['#value']['always'])) ? $element['#value']['end_date'] : '',
+    '#states' => array(
+      'visible' => array(
+        ':input[id="' . $always_id . '"]' => array('checked' => FALSE),
+      ),
+    ),
+  ) + $range['rooms_end_date'];
+
+  $element['constraint_type'] = array(
+    '#type' => 'select',
+    '#options' => array(
+      ROOMS_AVAILABILITY_CONSTRAINT_IF_STARTS => t('If booking starts on'),
+      ROOMS_AVAILABILITY_CONSTRAINT_MUST_START => t('booking must start on'),
+    ),
+    '#default_value' =>  isset($element['#value']['constraint_type']) ? $element['#value']['constraint_type'] : '',
+    '#prefix' => '<div class="container-inline">',
+  );
+
+  $element['start_day'] = array(
+    '#type' => 'select',
+    '#options' => array(1 => t('Monday'), 2 => t('Tuesday'), 3 => t('Wednesday'), 4 => t('Thursday'), 5 => t('Friday'), 6 => t('Saturday'),7 => t('Sunday')),
+    '#empty_option' => t('No constraint'),
+    '#default_value' => isset($element['#value']['start_day']) ? $element['#value']['start_day'] : '',
+    '#suffix' => '</div>'
+  );
+
+  $element['minimum_stay'] = array(
+    '#type' => 'textfield',
+    '#title' => t('The minimum allowed stay is:'),
+    '#size' => 2,
+    '#default_value' => isset($element['#value']['minimum_stay']) ? $element['#value']['minimum_stay'] : '',
+    '#description' => t('Enter an integer, where 0 or empty means no constraint'),
+  );
+
+  $element['maximum_stay'] = array(
+    '#type' => 'textfield',
+    '#title' => t('The maximum allowed stay is:'),
+    '#size' => 2,
+    '#default_value' => isset($element['#value']['maximum_stay']) ? $element['#value']['maximum_stay'] : '',
+    '#description' => t('Enter an integer, where 0 or empty means no constraint'),
+  );
+
+  $element['#element_validate'][] = 'rooms_availability_range_validate';
+
+  return $element;
+}
+
+/**
+ * VAlidaion callback for rooms_availability_range form element.
+ * @param $element
+ * @param $form_state
+ */
+function rooms_availability_range_validate($element, &$form_state) {
+  $columns = array('minimum_stay', 'maximum_stay', 'start_day');
+  foreach ($columns as $column) {
+    if (empty($element['#value'][$column])) {
+      form_set_value($element[$column], NULL, $form_state);
+    }
+  }
+
+  if (isset($element['#value']['always'])) {
+    form_set_value($element['start_date'], '1970-01-01', $form_state);
+    form_set_value($element['end_date'], '2999-12-31', $form_state);
+  }
 }

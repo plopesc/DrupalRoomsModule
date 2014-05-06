@@ -23,6 +23,20 @@ function rooms_availability_constraints_field_schema($field) {
           'length' => 10,
           'not null' => TRUE,
         ),
+        'always' => array(
+          'type' => 'int',
+          'not null' => TRUE,
+          'default' => 1,
+        ),
+        'constraint_type' => array(
+          'type' => 'varchar',
+          'length' => 20,
+          'not null' => TRUE,
+        ),
+        'start_day' => array(
+          'type' => 'int',
+          'not null' => FALSE,
+        ),
         'minimum_stay' => array(
           'type' => 'int',
           'not null' => FALSE,
@@ -31,10 +45,10 @@ function rooms_availability_constraints_field_schema($field) {
           'type' => 'int',
           'not null' => FALSE,
         ),
-        'start_day' => array(
-          'type' => 'int',
-          'not null' => FALSE,
-        ),
+      ),
+      'indexes' => array(
+        'range' => array('start_date', 'end_date', 'minimum_stay', 'maximum_stay'),
+        'range_day' => array('start_date', 'end_date', 'minimum_stay', 'maximum_stay', 'start_day'),
       ),
     );
   }

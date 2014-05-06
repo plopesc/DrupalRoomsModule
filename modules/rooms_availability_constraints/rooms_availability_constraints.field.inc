@@ -19,7 +19,7 @@ function rooms_availability_constraints_field_info() {
  * Implements hook_field_is_empty().
  */
 function rooms_availability_constraints_field_is_empty($item, $field) {
-  return empty($item['start_date']) || empty($item['start_date']) || (empty($item['maximum_stay']) && empty($item['minimum_stay']));
+  return empty($item['start_date']) || empty($item['start_date']);
 }
 
 /**
@@ -29,7 +29,7 @@ function rooms_availability_constraints_field_widget_info() {
   return array(
     'rooms_availability_constraints_range' => array(
       'label' => t('Availability range'),
-      'description' => t(''),
+      'description' => t('Availability range widget'),
       'field types' => array('rooms_availability_constraints_range'),
       'settings' => array(),
     ),
@@ -41,40 +41,16 @@ function rooms_availability_constraints_field_widget_info() {
  */
 function rooms_availability_constraints_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
   if ($instance['widget']['type'] == 'rooms_availability_constraints_range') {
-    $range = rooms_date_range_fields();
-    $element['start_date'] = $range['rooms_start_date'];
-    $element['end_date'] = $range['rooms_end_date'];
-
-    $element['start_date']['#required'] = FALSE;
-    $element['start_date']['#default_value'] = isset($items[$delta]['start_date']) ? $items[$delta]['start_date'] : '';
-    $element['end_date']['#required'] = FALSE;
-    $element['end_date']['#default_value'] = isset($items[$delta]['end_date']) ? $items[$delta]['end_date'] : '';
-
-    $element['minimum_stay'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Minimum stay'),
-      '#size' => 2,
-      '#default_value' => isset($items[$delta]['minimum_stay']) ? $items[$delta]['minimum_stay'] : '',
-    );
-
-    $element['maximum_stay'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Maximum stay'),
-      '#size' => 2,
-      '#default_value' => isset($items[$delta]['maximum_stay']) ? $items[$delta]['maximum_stay'] : '',
-    );
-
-    $element['start_day'] = array(
-      '#type' => 'select',
-      '#options' => array(1 => t('Sunday'), 2 => t('Monday'), 3 => t('Tuesday'), 4 => t('Wednesday'), 5 => t('Thursday'), 6 => t('Friday'), 7 => t('Saturday')),
-      '#empty_option' => t('- Select -'),
-      '#default_value' => isset($items[$delta]['start_day']) ? $items[$delta]['start_day'] : '',
+    $element += array(
+      '#type' => 'rooms_availability_range',
+      '#default_value' => isset($items[$delta]) ? $items[$delta] : '',
     );
 
     if ($field['cardinality'] == FIELD_CARDINALITY_UNLIMITED) {
       $element['remove'] = array(
         '#type' => 'submit',
         '#value' => t('Remove'),
+        '#weight' => 100,
         '#attributes' => array(
           'class' => array('remove-booking-option'),
         ),
@@ -85,7 +61,6 @@ function rooms_availability_constraints_field_widget_form(&$form, &$form_state, 
         ),
       );
     }
-
     return $element;
   }
 }
