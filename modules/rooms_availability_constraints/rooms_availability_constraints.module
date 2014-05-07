@@ -161,7 +161,7 @@ function rooms_availability_range_process($element, $form_state, $complete_form)
   $element['start_date'] = array(
     '#title' => t('Start date'),
     '#required' => FALSE,
-    '#default_value' => (isset($element['#value']['start_date']) && !isset($element['#value']['always'])) ? $element['#value']['start_date'] : '',
+    '#default_value' => (isset($element['#value']['start_date']) && empty($element['#value']['always'])) ? $element['#value']['start_date'] : '',
     '#states' => array(
       'visible' => array(
         ':input[id="' . $always_id . '"]' => array('checked' => FALSE),
@@ -172,7 +172,7 @@ function rooms_availability_range_process($element, $form_state, $complete_form)
   $element['end_date'] = array(
     '#title' => t('End date'),
     '#required' => FALSE,
-    '#default_value' => (isset($element['#value']['end_date']) && !isset($element['#value']['always'])) ? $element['#value']['end_date'] : '',
+    '#default_value' => (isset($element['#value']['end_date']) && empty($element['#value']['always'])) ? $element['#value']['end_date'] : '',
     '#states' => array(
       'visible' => array(
         ':input[id="' . $always_id . '"]' => array('checked' => FALSE),
