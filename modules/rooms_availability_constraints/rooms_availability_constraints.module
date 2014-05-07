@@ -44,7 +44,7 @@ function rooms_availability_constraints_form_rooms_unit_type_form_alter(&$form, 
     $form['rooms_constraints_range']['#access'] = FALSE;
   }
 
-  array_unshift($form['#submit'], 'rooms_availability_constraints_rooms_unit_type_form_submit');
+  $form['#submit'][] = 'rooms_availability_constraints_rooms_unit_type_form_submit';
 }
 
 /**
@@ -68,7 +68,8 @@ function rooms_availability_constraints_rooms_unit_type_form_submit($form, &$for
 
   if (variable_get('rooms_availability_constraints_type_' . $unit_type->type, 0) == 1
     && $form_state['values']['rooms_availability_range_type'] == 0) {
-    $form_state['values']['rooms_constraints_range']['und'] = array();
+    $unit_type->rooms_constraints_range[LANGUAGE_NONE] = array();
+    entity_save('rooms_unit_type', $unit_type);
   }
 
   variable_set('rooms_availability_constraints_unit_' . $unit_type->type, $form_state['values']['rooms_availability_range_unit']);
