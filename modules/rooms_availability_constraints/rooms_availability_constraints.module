@@ -28,16 +28,16 @@ function rooms_availability_constraints_form_rooms_unit_type_form_alter(&$form, 
 
   $form['availability_constraints']['rooms_availability_range_unit'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable Rooms availability range constraints at unit level'),
+    '#title' => t('Enable availability range constraints per unit'),
     '#default_value' => variable_get('rooms_availability_constraints_unit_' . $unit_type->type, 0),
-    '#description' => t('If you disable this feature, all the stored data will be removed')
+    '#description' => t('This will allow you to define a minimum or maximum booking period for each unit of this type. If you disable this feature, all the stored data will be removed')
   );
 
   $form['availability_constraints']['rooms_availability_range_type'] = array(
     '#type' => 'checkbox',
-    '#title' => t('Enable Rooms availability range constraints at unit type level'),
+    '#title' => t('Enable availability range constraints for all units of this type'),
     '#default_value' => variable_get('rooms_availability_constraints_type_' . $unit_type->type, 0),
-    '#description' => t('If you disable this feature, all the stored data will be removed')
+    '#description' => t('This will allow you to define a minimum or maximum booking period for all units of this type. If you disable this feature, all the stored data will be removed')
   );
 
   if (variable_get('rooms_availability_constraints_type_' . $unit_type->type, 0) == 0) {
