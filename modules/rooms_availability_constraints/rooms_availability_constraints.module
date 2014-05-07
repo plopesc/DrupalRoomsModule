@@ -19,10 +19,10 @@ function rooms_availability_constraints_form_rooms_unit_type_form_alter(&$form, 
     '#tree' => FALSE,
     '#weight' => 80,
     '#attributes' => array(
-      'class' => array('unit-form-availability '),
+      'class' => array('unit-type-form-constraints'),
     ),
     '#attached' => array(
-      'js' => array(drupal_get_path('module', 'rooms_unit') . '/js/rooms_unit.js'),
+      'js' => array(drupal_get_path('module', 'rooms_availability_constraints') . '/js/rooms_availability_constraints_tab.js'),
     ),
   );
 
@@ -159,6 +159,7 @@ function rooms_availability_range_process($element, $form_state, $complete_form)
   );
 
   $element['start_date'] = array(
+    '#title' => t('Start date'),
     '#required' => FALSE,
     '#default_value' => (isset($element['#value']['start_date']) && !isset($element['#value']['always'])) ? $element['#value']['start_date'] : '',
     '#states' => array(
@@ -169,6 +170,7 @@ function rooms_availability_range_process($element, $form_state, $complete_form)
   ) + $range['rooms_start_date'];
 
   $element['end_date'] = array(
+    '#title' => t('End date'),
     '#required' => FALSE,
     '#default_value' => (isset($element['#value']['end_date']) && !isset($element['#value']['always'])) ? $element['#value']['end_date'] : '',
     '#states' => array(
@@ -218,7 +220,7 @@ function rooms_availability_range_process($element, $form_state, $complete_form)
 }
 
 /**
- * VAlidaion callback for rooms_availability_range form element.
+ * Validation callback for rooms_availability_range form element.
  * @param $element
  * @param $form_state
  */

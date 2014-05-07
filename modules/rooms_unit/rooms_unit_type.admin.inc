@@ -50,24 +50,26 @@ function rooms_unit_type_form($form, &$form_state, $unit_type, $op = 'edit') {
     '#description' => t('The human-readable name of this unit type.'),
     '#required' => TRUE,
     '#size' => 30,
+    '#weight' => -100,
   );
   // Machine-readable type name.
   $form['type'] = array(
     '#type' => 'machine_name',
     '#default_value' => isset($unit_type->type) ? $unit_type->type : '',
     '#maxlength' => 32,
-//    '#disabled' => $unit_type->isLocked() && $op != 'clone',
     '#machine_name' => array(
       'exists' => 'rooms_unit_get_types',
       'source' => array('label'),
     ),
     '#description' => t('A unique machine-readable name for this unit type. It must only contain lowercase letters, numbers, and underscores.'),
+    '#weight' => -99,
   );
 
   $form['unit_defaults'] = array(
     '#type' => 'fieldset',
     '#description' => '<strong>' . t('Unit defaults') . '</strong> - ' . t('Values specified below will be pre-populated as the defaults when creating units of this type.'),
     '#tree' => FALSE,
+    '#weight' => -98,
   );
 
   $form['unit_defaults']['data']['#tree'] = TRUE;
@@ -131,6 +133,7 @@ function rooms_unit_type_form($form, &$form_state, $unit_type, $op = 'edit') {
   $form['reference'] = array(
     '#type' => 'fieldset',
     '#tree' => FALSE,
+    '#weight' => -97,
   );
 
   $form['reference']['data']['#tree'] = TRUE;
@@ -143,7 +146,6 @@ function rooms_unit_type_form($form, &$form_state, $unit_type, $op = 'edit') {
     '#maxlength' => 60,
     '#autocomplete_path' => 'admin/rooms/unit-type/description-source',
     '#default_value' => isset($unit_type->data['rooms_description_source']) ? $unit_type->data['rooms_description_source'] : '',
-    '#weight' => 99,
   );
 
   // Add the field related form elements.
