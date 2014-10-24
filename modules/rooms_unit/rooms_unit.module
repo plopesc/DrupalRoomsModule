@@ -765,6 +765,15 @@ class RoomsUnitController extends EntityAPIController {
     return $unit;
   }
 
+  public function delete($ids, DatabaseTransaction $transaction = NULL) {
+    parent::delete($ids, $transaction);
+
+    // Remove rows related to these units from rooms_availability table.
+    db_delete('rooms_availability')
+      ->condition('unit_id', $ids)
+      ->execute();
+  }
+
   /**
    * Overriding the buildContent function to add entity specific fields.
    */
